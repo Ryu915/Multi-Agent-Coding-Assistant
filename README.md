@@ -1,297 +1,326 @@
-# AI Software Engineering Team
+# 🤖 AI Software Engineering Team
 
-An AI-powered multi-agent software engineering assistant built using **LangGraph**, **LangChain**, **Ollama**, and **ChromaDB**.
+> A **multi-agent AI Software Engineering Assistant** built with **LangGraph** that understands existing codebases, answers project-specific questions, plans feature implementations, generates code, and performs iterative code review through a team of specialized AI agents.
 
-Instead of relying on a single LLM, this project uses a team of specialized AI agents that collaborate to understand an existing codebase, plan implementation tasks, retrieve relevant project context, generate code changes, and (eventually) review and apply those changes.
-
----
-
-## Features
-
-- Project Loader
-  - Scans an existing project
-  - Indexes source files
-  - Stores embeddings in ChromaDB
-
-- Understanding Agent
-  - Understands the architecture of the loaded project
-  - Generates a structured project summary
-  - Identifies technologies, modules and execution flow
-
-- Router Agent
-  - Understands user intent
-  - Routes requests to the appropriate agent
-  - Handles general conversation
-
-- Planner Agent
-  - Creates a step-by-step implementation plan
-  - Identifies files to modify
-  - Determines retrieval targets
-  - Estimates possible risks
-
-- Human Approval
-  - Allows the user to approve or reject the generated plan before coding begins
-
-- Retriever Agent
-  - Searches ChromaDB
-  - Retrieves only the relevant project context required for implementation
-
-- Coder Agent
-  - Generates structured code changes
-  - Produces file-level modifications for the Apply agent
+![Python](https://img.shields.io/badge/Python-3.13-blue)
+![LangGraph](https://img.shields.io/badge/LangGraph-Multi--Agent-green)
+![LangChain](https://img.shields.io/badge/LangChain-Framework-orange)
+![Ollama](https://img.shields.io/badge/Ollama-Local%20LLMs-black)
+![License](https://img.shields.io/badge/License-MIT-brightgreen)
 
 ---
 
-## Workflow
+## Overview
 
+Modern AI coding assistants are excellent at generating code, but they often lack an understanding of the overall project architecture and provide limited control over the software development workflow.
+
+This project implements an **AI Software Engineering Team** where multiple specialized agents collaborate to solve software engineering tasks. Instead of relying on a single LLM, the system routes requests to dedicated agents responsible for understanding the codebase, answering repository questions, planning implementations, retrieving relevant context, generating code, reviewing it, and applying changes.
+
+The workflow is orchestrated using **LangGraph**, enabling structured, stateful interactions between agents.
+
+---
+
+# Features
+
+* 🤖 Multi-agent architecture using LangGraph
+* 💬 Conversational chatbot interface
+* 📂 Automatic project loading and indexing
+* 🧠 AI-generated project understanding
+* 🔍 Retrieval-Augmented Generation (RAG) for repository questions
+* 📋 AI implementation planning
+* ✅ Human-in-the-loop approval workflow
+* 🎯 Context-aware code retrieval
+* 💻 AI code generation
+* 🔄 Reflection-based code review loop
+* 📝 Automatic code application
+* 🗂️ Persistent vector database using ChromaDB
+* ⚡ Local LLM support through Ollama
+
+---
+
+# Architecture
+
+```mermaid
+flowchart TD
+
+    start([START])
+
+    loader["Loader (ChromaDB)"]
+    understanding["Understanding Agent"]
+    router["Orchestrator Agent"]
+
+    qa["Project QA Agent"]
+
+    planner["Planning Agent"]
+    retriever["Retriever Agent"]
+    coder["Coding Agent"]
+    reflection["Reflection Agent"]
+
+    apply["Apply / Write Agent"]
+
+    finish([END])
+
+    start --> loader
+    loader --> understanding
+    understanding --> router
+
+    router --> qa
+    qa --> finish
+
+    router --> planner
+    planner --> retriever
+    retriever --> coder
+
+    coder --> reflection
+    reflection --> coder
+
+    coder --> apply
+    apply --> finish
 ```
-                +----------------+
-                |     START      |
-                +-------+--------+
-                        |
-                        v
-                +----------------+
-                |     Router     |
-                +---+--------+---+
-                    |        |
-     Load Project   |        |  Coding Request
-                    |        |
-                    v        v
-              +---------+  +---------+
-              | Loader  |  | Planner |
-              +----+----+  +----+----+
-                   |            |
-                   v            v
-           +---------------+  Human Approval
-           | Understanding |        |
-           +-------+-------+        |
-                   |                v
-                   +----------> Retriever
-                                |
-                                v
-                             Coder
-                                |
-                                v
-                         (Reflection)
-                                |
-                                v
-                            (Apply)
-                                |
-                                v
-                             Router
-```
+---
+
+# Agent Workflow
+
+| Agent                   | Responsibility                                                                                            |
+| ----------------------- | --------------------------------------------------------------------------------------------------------- |
+| **Loader**              | Loads the repository, scans files, chunks source code and builds vector embeddings.                       |
+| **Understanding Agent** | Generates a high-level understanding of the project architecture, technologies, modules and entry points. |
+| **Router / Chatbot**    | Understands user intent and routes requests to the correct agent. Maintains conversational history.       |
+| **Project QA**          | Answers project-specific questions using Retrieval-Augmented Generation (RAG).                            |
+| **Planner**             | Creates structured implementation plans before any code is generated.                                     |
+| **Human Approval**      | Allows the user to approve, revise or cancel the implementation plan.                                     |
+| **Retriever**           | Retrieves only the relevant project files needed for the task.                                            |
+| **Coder**               | Generates code using the approved plan and retrieved project context.                                     |
+| **Reflection**          | Reviews generated code and requests improvements until the solution meets the required quality.           |
+| **Apply**               | Writes the approved code back into the project.                                                           |
 
 ---
 
-## Tech Stack
+# Technologies
 
-### Frameworks
+### AI
 
-- LangGraph
-- LangChain
-
-### LLM
-
-- Ollama
-- Qwen 3 8B
-
-### Vector Database
-
-- ChromaDB
+* LangGraph
+* LangChain
+* Ollama
 
 ### Embeddings
 
-- BAAI/bge-small-en-v1.5
+* HuggingFace Embeddings
+* BAAI/bge-small-en-v1.5
+
+### Vector Database
+
+* ChromaDB
 
 ### Language
 
-- Python
+* Python 3.13
+
+### Supporting Libraries
+
+* Pydantic
+* python-dotenv
 
 ---
 
-## Project Structure
+# Project Structure
 
-```
-ai-sw-team/
-│
+```text
+.
 ├── agents/
+│   ├── loader.py
 │   ├── router.py
 │   ├── understanding.py
+│   ├── project_qa.py
 │   ├── planner.py
 │   ├── retriever.py
-│   └── coder.py
-│
-├── loader/
-│   ├── loader.py
-│   └── vector_store.py
+│   ├── coder.py
+│   ├── reflection.py
+│   └── apply.py
 │
 ├── prompts/
-│
 ├── models/
-│
 ├── schemas/
-│
 ├── graph.py
 ├── state.py
-├── human.py
 ├── main.py
-│
-└── chroma_db/
+└── requirements.txt
 ```
 
 ---
 
-## Current Agent Flow
+# How It Works
+
+1. The user provides the project path.
+2. The Loader indexes the project and creates embeddings.
+3. The Understanding Agent analyzes the repository and generates a project summary.
+4. The Router receives every user request.
+5. Depending on the request:
+
+   * Project questions are routed to the **Project QA Agent**.
+   * Feature requests are routed to the **Planner Agent**.
+   * General conversation is handled directly by the Router.
+6. The Planner creates an implementation plan.
+7. The user approves, revises, or cancels the plan.
+8. The Retriever fetches only the relevant project context.
+9. The Coder generates code.
+10. The Reflection Agent reviews the generated code and requests revisions if necessary.
+11. Once approved, the Apply Agent writes the changes back to the project.
+
+---
+
+# Example Use Cases
+
+### Understand an Existing Project
 
 ```
-User
-   │
-   ▼
-Router
-   │
-   ├────────► Loader
-   │             │
-   │             ▼
-   │      Understanding
-   │             │
-   │             ▼
-   │          Router
-   │
-   └────────► Planner
-                  │
-                  ▼
-          Human Approval
-                  │
-                  ▼
-             Retriever
-                  │
-                  ▼
-               Coder
+User:
+Explain how authentication works.
+```
+
+The Project QA Agent retrieves the relevant files and explains the authentication flow.
+
+---
+
+### Add a New Feature
+
+```
+User:
+Add JWT Authentication.
+```
+
+Workflow:
+
+```
+Planner
+    ↓
+Human Approval
+    ↓
+Retriever
+    ↓
+Coder
+    ↓
+Reflection
+    ↓
+Apply
 ```
 
 ---
 
-## Future Work
+### Explain Repository Structure
 
-- Reflection Agent
-- Apply Agent
-- Automatic code patching
-- Git integration
-- Tool calling
-- Memory across conversations
-- Multi-file code editing
-- IDE integration
+```
+User:
+What is the purpose of the services folder?
+```
+
+The system retrieves only the relevant project files before answering.
 
 ---
 
-## Installation
+# Running the Project
 
-Clone the repository
+## 1. Clone the Repository
 
 ```bash
-git clone <repository-url>
-cd ai-sw-team
+git clone https://github.com/<username>/<repository>.git
+
+cd <repository>
 ```
 
-Create a virtual environment
+---
+
+## 2. Create a Virtual Environment
+
+### macOS / Linux
 
 ```bash
-python -m venv venv
-```
+python3 -m venv venv
 
-Activate it
-
-### macOS/Linux
-
-```bash
 source venv/bin/activate
 ```
 
 ### Windows
 
 ```bash
+python -m venv venv
+
 venv\Scripts\activate
 ```
 
-Install dependencies
+---
+
+## 3. Install Dependencies
 
 ```bash
 pip install -r requirements.txt
 ```
 
-Run Ollama
+---
 
-```bash
-ollama serve
-```
+## 4. Install Ollama
 
-Download the model
+Download and install Ollama:
+
+https://ollama.com
+
+Pull the required model:
 
 ```bash
 ollama pull qwen3:8b
 ```
 
-Run the project
+Verify that Ollama is running before starting the application.
+
+---
+
+## 5. Configure Environment Variables
+
+Create a `.env` file in the project root.
+
+Example:
+
+```env
+MODEL_NAME=qwen3:8b
+```
+
+---
+
+## 6. Run the Application
 
 ```bash
 python main.py
 ```
 
----
-
-## Example Usage
-
-```
-User:
-Add JWT authentication.
-
-↓
-
-Router
-
-↓
-
-Planner
-
-↓
-
-Human Approval
-
-↓
-
-Retriever
-
-↓
-
-Coder
-
-↓
-
-Generated code changes
-```
+The application will prompt for the project path before starting the AI software engineering workflow.
 
 ---
 
-## Status
+# Future Improvements
 
-Current Progress
-
-- [x] Loader
-- [x] Understanding Agent
-- [x] Router
-- [x] Planner
-- [x] Human Approval
-- [x] Retriever
-- [x] Coder
-- [ ] Reflection Agent
-- [ ] Apply Agent
-- [ ] Git Integration
-- [ ] Memory
+* VS Code extension
+* Git integration
+* Automatic test generation
+* Streaming responses
+* Multi-project support
+* Tool calling
+* Memory across sessions
+* Code diff preview
+* Automatic documentation generation
 
 ---
 
-## Author
+# License
 
-**Ishaan Suryavanshi**
+This project is licensed under the MIT License.
 
-Computer Engineering Student | AI & Full Stack Developer
+---
+
+# Author
+
+**Ishaan**
+
+Final Year Computer Engineering Student
+
+Interested in **Agentic AI**, **LLM Systems**, **Software Engineering**, and **Cybersecurity**.

@@ -50,7 +50,9 @@ def main():
         "router_response": "",
         "chat_history": [],
         "reflection": None,
-        "reflection_iteration": 0
+        "reflection_iteration": 0,
+        "plan": [],
+        "human_feedback": ""
     }
 
         # Run the agent
@@ -70,9 +72,7 @@ def main():
 
         # till here
 
-        if state["next_agent"] == "end":
-            break
-    
+        
 if __name__ == "__main__":
     main()
 

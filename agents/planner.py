@@ -17,7 +17,9 @@ def planner_node(state):
             project_summary = understanding.summary,
             project_structure = understanding.architecture,
             technologies = understanding.technologies,
-            user_request = state["user_input"]
+            user_request = state["user_input"],
+            previous_plan = state["plan"],
+            human_feedback = state["human_feedback"]
         )
     )
 

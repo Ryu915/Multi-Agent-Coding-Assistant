@@ -34,11 +34,12 @@ def router_node(state):
     )
 
 
-    if result.next_agent == "none" or result.next_agent == "END":
+    if result.next_agent == "none" or result.next_agent == "end":
         state["chat_history"].append(
             AIMessage(content=result.message)
         )
+        print(f"\nAssistant: {result.message}")
 
-    print(f"\nNext agent: {result.next_agent}")
+   
     
     return state

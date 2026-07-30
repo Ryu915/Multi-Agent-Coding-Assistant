@@ -20,6 +20,11 @@ Technologies:
 User Request:
 {user_request}
 
+Previous Plan:
+{previous_plan}
+
+Human Feedback:
+{human_feedback}
 Your task is to create a software implementation plan.
 
 Do NOT write code.
